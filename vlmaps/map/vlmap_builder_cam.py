@@ -66,6 +66,8 @@ class VLMapBuilderCam:
         # access config info
         cs = self.map_config.cell_size
         gs = self.map_config.grid_size
+        max_depth = self.map_config.max_depth
+        min_depth = self.map_config.min_depth
         depth_sample_rate = self.map_config.depth_sample_rate
         self.camera_pose_tfs = np.loadtxt(self.pose_path)
         if self.rot_type == "quat":
@@ -98,7 +100,7 @@ class VLMapBuilderCam:
             bgr = cv2.imread(str(rgb_path))
             rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
             depth = load_depth_npy(depth_path.as_posix())
-            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth=0.1, max_depth=10)
+            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth, max_depth)
             transform_tf = camera_pose_tf  # @ self.habitat2cam_rot_tf
             pc_global = transform_pc(pc, transform_tf)  # (3, N)
             pcd_global = o3d.geometry.PointCloud()
@@ -138,7 +140,7 @@ class VLMapBuilderCam:
             pix_feats_intr = get_sim_cam_mat(pix_feats.shape[2], pix_feats.shape[3])
 
             # backproject depth point cloud
-            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth=0.1, max_depth=100)
+            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth, max_depth)
 
             # transform the point cloud to global frame (init base frame)
             transform_tf = camera_pose_tf  # @ self.habitat2cam_rot_tf

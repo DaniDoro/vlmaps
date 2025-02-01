@@ -60,6 +60,8 @@ class VLMapBuilder:
         camera_height = self.map_config.pose_info.camera_height
         cs = self.map_config.cell_size
         gs = self.map_config.grid_size
+        max_depth = self.map_config.max_depth
+        min_depth = self.map_config.min_depth
         depth_sample_rate = self.map_config.depth_sample_rate
 
         self.base_poses = np.loadtxt(self.pose_path)
@@ -129,7 +131,7 @@ class VLMapBuilder:
             pix_feats_intr = get_sim_cam_mat(pix_feats.shape[2], pix_feats.shape[3])
 
             # backproject depth point cloud
-            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth=0.1, max_depth=6)
+            pc = self._backproject_depth(depth, calib_mat, depth_sample_rate, min_depth, max_depth)
 
             # transform the point cloud to global frame (init base frame)
             # pc_transform = self.inv_init_base_tf @ self.base_transform @ habitat_base_pose @ self.base2cam_tf
@@ -284,6 +286,11 @@ class VLMapBuilder:
         return pc
 
     def _out_of_range(self, row: int, col: int, height: int, gs: int, vh: int) -> bool:
+        print("row: ", row)
+        print("col: ", col)
+        print("height: ", height)
+        print("gs: ", gs)
+        print("vh: ", vh)
         return col >= gs or row >= gs or height >= vh or col < 0 or row < 0 or height < 0
 
     def _reserve_map_space(
