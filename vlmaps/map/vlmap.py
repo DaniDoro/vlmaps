@@ -244,18 +244,18 @@ class VLMap(Map):
     #     # labeled_map_cropped = self.labeled_map_cropped.copy()
     #     return self.scores_map[:, :, cat_id]
 
-    def get_pos(self, name: str) -> Tuple[List[List[int]], List[List[float]], List[np.ndarray], Any]:
+    def get_pos(self, name: str, init_cat: bool = True) -> Tuple[List[List[int]], List[List[float]], List[np.ndarray], Any]:
         """
         Get the contours, centers, and bbox list of a certain category
         on a full map
         """
-        assert self.categories
+        # assert self.categories
         # cat_id = find_similar_category_id(name, self.categories)
         # labeled_map_cropped = self.scores_mat.copy()  # (N, C) N: number of voxels, C: number of categories
         # labeled_map_cropped = np.argmax(labeled_map_cropped, axis=1)  # (N,)
         # pc_mask = labeled_map_cropped == cat_id # (N,)
         # self.grid_pos[pc_mask]
-        pc_mask = self.index_map(name, with_init_cat=True)
+        pc_mask = self.index_map(name, init_cat)
         mask_2d = pool_3d_label_to_2d(pc_mask, self.grid_pos, self.gs)
         mask_2d = mask_2d[self.rmin : self.rmax + 1, self.cmin : self.cmax + 1]
         # print(f"showing mask for object cat {name}")
